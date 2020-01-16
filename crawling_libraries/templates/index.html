@@ -1,0 +1,7 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}" >
+
+{% for library in libraries %}
+    <div><a href="{% url 'details' library.id %}">{{ library.name }}</a></div>
+{% endfor %}

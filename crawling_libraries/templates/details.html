@@ -1,0 +1,20 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}" >
+
+
+<div><a href="{% url 'index' %}">Home</a></div>
+<div><a href="#" onclick="javascrip:history.go(-1);">Back</a></div><br/>
+
+<div><span class="title">Name: </span> {{ library.name }}</div>
+<div><span class="title">Description: </span> <pre>{{ library.description }}</pre></div>
+<div><span class="title">Depends: </span>
+    {% for depend_library in library.get_depends_as_array %}
+        <span><a href="{% url 'details' depend_library.id %}">{{ depend_library.name }}</a></span>
+    {% endfor %}
+</div>
+<div><span class="title">Reverse Depends: </span>
+    {% for reverse_depend_library in library.get_reverse_depends_as_array %}
+        <span><a href="{% url 'details' reverse_depend_library.id %}">{{ reverse_depend_library.name }}</a></span>
+    {% endfor %}
+</div>

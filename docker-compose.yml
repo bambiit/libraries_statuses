@@ -1,0 +1,33 @@
+version: "2.4"
+services:
+  postgre:
+    build: './db'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dockerservice -d libraries_status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+    volumes:
+      - ./postgre-volumes:/var/lib/postgresql/data/pgdata
+    environment:
+      POSTGRES_USER: librarydocker
+      POSTGRES_PASSWORD: password
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+
+  server:
+    build: '.'
+    volumes:
+      - .:/var/www/html
+    links:
+      - postgre:db
+    depends_on:
+      postgre:
+        condition: service_healthy
+    stdin_open: true
+    tty: true
+    ports:
+      - "8000:8000"
+    command: "python manage.py runserver 0.0.0.0:8000"
