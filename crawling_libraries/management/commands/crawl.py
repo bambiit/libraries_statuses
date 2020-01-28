@@ -19,8 +19,8 @@ class Command(BaseCommand):
             name = ''
             description = ''
             depends = []
-            reverse_depends = []
             input_description = False
+            current_library = None
 
             for line in file:
                 if input_description:
@@ -30,22 +30,18 @@ class Command(BaseCommand):
                         input_description = False
 
                 if "Package:" in line:
-                    if name:
-                        self.insert_update_library(depends, description, name, reverse_depends)
-
+                    if current_library:
+                        self.insert_or_update_library(current_library, name, depends, description)
                         description = ''
                         depends = []
-                        reverse_depends = []
+                        current_library = None
 
                     name = line.split(":", 1)[1].strip()
+                    current_library = self.insert_or_update_library(current_library, name)
 
-                if "Depends:" in line or "Pre-Depends:" in line:
+                if "Depends:" in line:
                     depend_library = line.split(":", 1)[1].strip()
-                    depends = json.dumps(self.assign_relevant_libraries(depend_library))
-
-                if "Suggests:" in line:
-                    reverse_depend_library = line.split(":", 1)[1].strip()
-                    reverse_depends = json.dumps(self.assign_relevant_libraries(reverse_depend_library))
+                    depends = json.dumps(self.assign_relevant_libraries(current_library, depend_library))
 
                 if "Description:" in line:
                     input_description = True
@@ -53,34 +49,51 @@ class Command(BaseCommand):
 
         # Insert last library
         if name:
-            self.insert_update_library(depends, description, name, reverse_depends)
+            self.insert_or_update_library(current_library, name, depends, description)
 
-    def insert_update_library(self, depends, description, name, reverse_depends):
-        try:
-            library = Libraries.objects.get(name=name)
-        except Libraries.DoesNotExist:
-            library = Libraries()
-            library.name = name
-        library.description = description
-        library.depends = depends
-        library.reverse_depends = reverse_depends
+    @staticmethod
+    def insert_or_update_library(library, name, depends = None, description =''):
+
+        if not library:
+            try:
+                library = Libraries.objects.get(name=name)
+            except Libraries.DoesNotExist:
+                library = Libraries()
+                library.name = name
+
+        if depends:
+            library.depends = depends
+
+        if description:
+            library.description = description
+
         library.save()
         return library
 
-    def assign_relevant_libraries(self, line):
-        depends_list = line.split(",")
+    @staticmethod
+    def assign_relevant_libraries(current_library, line):
+        depends_list = line.split("[,|]")
         depends = []
         for depend_library in depends_list:
             # remove version
             depend_library = depend_library.split("(", 1)[0].strip()
             try:
+                # get depends library
                 library = Libraries.objects.get(name=depend_library)
             except Libraries.DoesNotExist:
                 library = Libraries()
                 library.name = depend_library
-                library.save()
 
-            # assign to an array
+            # Update reverse depends list
+            reverse_depends_array = []
+            if library.reverse_depends:
+                reverse_depends_array = json.loads(library.reverse_depends)
+
+            reverse_depends_array.append({"id": current_library.id, "name": current_library.name})
+            library.reverse_depends = json.dumps(reverse_depends_array)
+            library.save()
+
+            # assign depends to an array
             depends.append({"id": library.id, "name": depend_library})
         return depends
 
