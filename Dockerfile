@@ -10,4 +10,4 @@ RUN pip install python-dotenv && pip install Django && pip install psycopg2-bina
 
 WORKDIR /var/www/html
 RUN chown -R www-data:www-data /var/www/html
-EXPOSE 8000
+EXPOSE 80

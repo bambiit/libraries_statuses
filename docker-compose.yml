@@ -29,5 +29,5 @@ services:
     stdin_open: true
     tty: true
     ports:
-      - "8000:8000"
-    command: "python manage.py runserver 0.0.0.0:8000"
+      - "80:80"
+    command: "python manage.py runserver 0.0.0.0:80"
