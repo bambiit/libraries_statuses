@@ -23,16 +23,3 @@ networks:
   creaktor:
     external: true
 
-#  server:
-#    build: '.'
-#    volumes:
-#      - .:/var/www/html
-#    links:
-#      - postgre:db
-#    depends_on:
-#      postgre:
-#        condition: service_healthy
-#    stdin_open: true
-#    tty: true
-#    ports:
-#      - "80:80"

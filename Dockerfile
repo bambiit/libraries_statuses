@@ -12,4 +12,4 @@ WORKDIR /var/www/html
 ADD . /var/www/html
 RUN chown -R www-data:www-data /var/www/html
 
-CMD python manage.py crawl && python manage.py runserver 0.0.0.0:$PORT
+CMD python manage.py migrate && python manage.py crawl && python manage.py runserver 0.0.0.0:$PORT
