@@ -6,8 +6,10 @@ RUN apt-get update \
   && ln -s /usr/bin/python3 python \
   && pip3 install --upgrade pip
 
-RUN pip install python-dotenv && pip install Django && pip install psycopg2-binary
+RUN pip install python-dotenv && pip install Django && pip install psycopg2-binary && pip install django-connection-url
 
 WORKDIR /var/www/html
+ADD . /var/www/html
 RUN chown -R www-data:www-data /var/www/html
-EXPOSE 80
+
+CMD python manage.py crawl && python manage.py runserver 0.0.0.0:$PORT

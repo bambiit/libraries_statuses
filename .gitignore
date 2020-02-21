@@ -1,3 +1,4 @@
 postgre-volumes/
 .idea/
 crawling_libraries/management/commands/__pycache__/
+*.pyc

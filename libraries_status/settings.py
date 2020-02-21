@@ -11,9 +11,9 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
-
+import connection_url
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# BASE_DIR = os.path.dirnamte(os.path.dirname(os.path.abspath(__file__)))
 
 
 # Quick-start development settings - unsuitable for production
@@ -86,6 +86,9 @@ DATABASES = {
         'PORT': '5432'
     }
 }
+
+DATABASE_URL = os.environ.get("DATABASE_URL")
+DATABASES['default'] = connection_url.config(DATABASE_URL)
 
 
 # Password validation

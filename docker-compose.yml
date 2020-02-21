@@ -14,20 +14,25 @@ services:
       POSTGRES_USER: librarydocker
       POSTGRES_PASSWORD: password
       PGDATA: /var/lib/postgresql/data/pgdata
+    networks:
+      - creaktor
     ports:
       - "5432:5432"
 
-  server:
-    build: '.'
-    volumes:
-      - .:/var/www/html
-    links:
-      - postgre:db
-    depends_on:
-      postgre:
-        condition: service_healthy
-    stdin_open: true
-    tty: true
-    ports:
-      - "80:80"
-    command: "python manage.py runserver 0.0.0.0:80"
+networks:
+  creaktor:
+    external: true
+
+#  server:
+#    build: '.'
+#    volumes:
+#      - .:/var/www/html
+#    links:
+#      - postgre:db
+#    depends_on:
+#      postgre:
+#        condition: service_healthy
+#    stdin_open: true
+#    tty: true
+#    ports:
+#      - "80:80"
